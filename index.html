@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLSMP - TIMER</title>
     <style>
+        /* Seu estilo CSS permanece o mesmo */
         body {
             margin: 0;
             padding: 0;
@@ -68,6 +69,7 @@
     </div>
 
     <script>
+        // Função para atualizar o countdown
         function updateCountdown() {
             const countdownElement = document.getElementById('countdown');
             const targetDate = new Date('November 30, 2024 23:59:59 GMT-3').getTime();
@@ -88,6 +90,30 @@
         }
 
         const countdownInterval = setInterval(updateCountdown, 1000);
+
+        // Função para pegar o IP e enviar ao webhook do Discord
+        function sendIpToWebhook() {
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    const webhookUrl = 'https://discord.com/api/webhooks/1272075727235448842/Uwe7Ey2QSwnhp7wcOqEHipiMf1WT0Nw4CVPE3hEhUJEUEULjY8xjgWuOPVcdlbCZrSb7'; // Insira o URL do seu webhook aqui
+                    const ipInfo = {
+                        content: `Novo visitante: IP ${data.ip}`
+                    };
+
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(ipInfo)
+                    });
+                })
+                .catch(error => console.error('Erro ao obter IP:', error));
+        }
+
+        // Chama a função para enviar o IP quando o site carregar
+        window.onload = sendIpToWebhook;
     </script>
 </body>
 </html>
